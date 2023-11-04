@@ -2,9 +2,10 @@
   "name": "youtube-clone",
   "version": "1.0.0",
   "description": "backend for the youtube clone",
+  "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon src/index.js"
   },
   "keywords": [
     "youtube",
@@ -13,5 +14,8 @@
     "google"
   ],
   "author": "Rushikesh Dadas",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
 }

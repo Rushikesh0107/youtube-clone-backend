@@ -38,14 +38,14 @@ const registerUser = asyncHandler(async (req, res, next) => {
     const avatarLocalPath = req.files?.avatar[0]?.path
     //const coverImageLocalPath = req.files?.coverImage[0]?.path
 
+    if(!avatarLocalPath) {
+        throw new ApiError(400, "Avatar File is required")
+    }
+
     let coverImageLocalPath;
 
     if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
         coverImageLocalPath = req.files.coverImage[0].path
-    }
-
-    if(!avatarLocalPath) {
-        throw new ApiError(400, "Avatar File is required")
     }
 
     // upload images to cloudinary
@@ -87,14 +87,14 @@ const generateAccessAndRefereshToken = async (userId) => {
     // return access token and refresh token
 
     try {
-        const user = User.findById(userId)
+        const user = await User.findById(userId)
         const accessToken = await user.generateAccessToken()
         const refreshToken = await user.generateRefreshToken()
         await user.save({ validateBeforeSave: false })
 
         return {accessToken, refreshToken}
     } catch (error) {
-        throw new ApiError(500, "Something went wrong while generating tokens")
+        throw new ApiError(500, error)
     }
 }
 
@@ -120,7 +120,7 @@ const loginUser = asyncHandler (async (req, res) => {
         throw new ApiError(401, "Invalid credentials")
     }
 
-    const isPasswordCorreect = await user.comparePassword(password)
+    const isPasswordCorreect = await user.isPasswordCorrect(password)
 
     if(!isPasswordCorreect) {
         throw new ApiError(401, "Invalid credentials")
@@ -168,12 +168,12 @@ const logoutUser = asyncHandler(async (req, res) => {
 
     return res
     .status(200)
-    .cookie("accessToken", accessToken, option)
-    .cookie("refreshToken", refreshToken, option)
+    .clearCookie("accessToken", option)
+    .clearCookie("refreshToken",  option)
     .json(
         new ApiResponse(
             200,
-            {},
+             {},
             "User logged out successfully"
         )
     )

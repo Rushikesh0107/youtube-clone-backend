@@ -1,7 +1,7 @@
 import mongoose , {Schema} from 'mongoose';
 
 const likeSchema = new Schema({
-    viideo: {
+    video: {
         type: Schema.Types.ObjectId,
         ref: 'Video'
     },
